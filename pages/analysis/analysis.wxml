@@ -1,0 +1,402 @@
+<!-- pages/analysis/analysis.wxml -->
+<view class="container">
+  <!-- 顶部时间选择器 -->
+  <view class="time-selector card">
+    <view class="selector-tabs">
+      <view 
+        wx:for="{{timePeriods}}" 
+        wx:key="value"
+        class="tab-item {{currentPeriod === item.value ? 'active' : ''}}"
+        bindtap="switchPeriod"
+        data-period="{{item.value}}"
+      >
+        {{item.label}}
+      </view>
+    </view>
+    
+    <!-- 自定义时间范围 -->
+    <view class="custom-range" wx:if="{{currentPeriod === 'custom'}}">
+      <picker 
+        mode="date" 
+        value="{{startDate}}" 
+        bindchange="onStartDateChange"
+        class="date-picker"
+      >
+        <view class="picker-text">{{startDate || '开始日期'}}</view>
+      </picker>
+      <text class="date-separator">至</text>
+      <picker 
+        mode="date" 
+        value="{{endDate}}" 
+        bindchange="onEndDateChange"
+        class="date-picker"
+      >
+        <view class="picker-text">{{endDate || '结束日期'}}</view>
+      </picker>
+    </view>
+    
+    <view class="period-summary">
+      <text class="summary-text">{{periodSummary}}</text>
+    </view>
+  </view>
+
+  <!-- 情绪趋势图 -->
+  <view class="trend-chart card">
+    <view class="card-title">
+      <text>情绪趋势</text>
+      <view class="chart-controls">
+        <view 
+          class="control-item {{chartType === 'line' ? 'active' : ''}}"
+          bindtap="switchChartType"
+          data-type="line"
+        >
+          📈
+        </view>
+        <view 
+          class="control-item {{chartType === 'bar' ? 'active' : ''}}"
+          bindtap="switchChartType"
+          data-type="bar"
+        >
+          📊
+        </view>
+      </view>
+    </view>
+    
+    <view class="chart-container">
+      <canvas 
+        canvas-id="trendChart"
+        class="chart-canvas"
+        bindtouchstart="onChartTouch"
+      ></canvas>
+      
+      <view class="chart-empty" wx:if="{{!hasChartData}}">
+        <image class="empty-icon" src="../../assets/icons/chart-empty.png" />
+        <text class="empty-text">暂无数据，快去记录心情吧 😊</text>
+      </view>
+    </view>
+    
+    <view class="chart-legend" wx:if="{{hasChartData}}">
+      <view 
+        wx:for="{{chartLegend}}" 
+        wx:key="label"
+        class="legend-item"
+      >
+        <view class="legend-color" style="background-color: {{item.color}}"></view>
+        <text class="legend-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 情绪分布统计 -->
+  <view class="emotion-stats card">
+    <view class="card-title">情绪分布</view>
+    
+    <view class="stats-overview">
+      <view class="overview-item">
+        <view class="overview-number">{{totalRecords}}</view>
+        <view class="overview-label">总记录数</view>
+      </view>
+      <view class="overview-item">
+        <view class="overview-number">{{averageIntensity}}</view>
+        <view class="overview-label">平均强度</view>
+      </view>
+      <view class="overview-item">
+        <view class="overview-number">{{streakDays}}</view>
+        <view class="overview-label">连续天数</view>
+      </view>
+    </view>
+
+    <!-- 情绪圆环图 -->
+    <view class="pie-chart-container">
+      <canvas 
+        canvas-id="emotionPieChart"
+        class="pie-chart"
+      ></canvas>
+      
+      <view class="pie-center-info">
+        <view class="center-number">{{dominantPercentage}}%</view>
+        <view class="center-label">{{dominantEmotion}}</view>
+      </view>
+    </view>
+
+    <!-- 情绪列表 -->
+    <view class="emotion-list">
+      <view 
+        wx:for="{{emotionStats}}" 
+        wx:key="emotion"
+        class="emotion-item"
+      >
+        <view class="emotion-info">
+          <text class="emotion-emoji">{{item.emoji}}</text>
+          <text class="emotion-name">{{item.emotion}}</text>
+        </view>
+        <view class="emotion-progress">
+          <view class="progress-bar">
+            <view 
+              class="progress-fill" 
+              style="width: {{item.percentage}}%; background-color: {{item.color}}"
+            ></view>
+          </view>
+          <view class="progress-text">
+            <text class="progress-count">{{item.count}}次</text>
+            <text class="progress-percent">{{item.percentage}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI 深度洞察 -->
+  <view class="ai-insights card">
+    <view class="card-title">
+      <image class="ai-icon" src="../../assets/icons/ai.png" />
+      <text>AI 深度洞察</text>
+      <view class="insight-loading" wx:if="{{insightLoading}}">
+        <view class="loading loading-small"></view>
+      </view>
+    </view>
+
+    <view class="insights-list" wx:if="{{aiInsights.length > 0}}">
+      <view 
+        wx:for="{{aiInsights}}" 
+        wx:key="id"
+        class="insight-item"
+      >
+        <view class="insight-header">
+          <image class="insight-icon" src="{{item.icon}}" />
+          <text class="insight-title">{{item.title}}</text>
+          <view class="insight-confidence">{{item.confidence}}%</view>
+        </view>
+        <view class="insight-content">{{item.content}}</view>
+        <view class="insight-actions" wx:if="{{item.actions}}">
+          <text 
+            wx:for="{{item.actions}}" 
+            wx:for-item="action"
+            wx:key="*this"
+            class="action-link"
+            bindtap="handleInsightAction"
+            data-action="{{action}}"
+          >
+            {{action}}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <view class="insight-empty" wx:if="{{!insightLoading && aiInsights.length === 0}}">
+      <text>需要更多数据来生成深度洞察</text>
+    </view>
+  </view>
+
+  <!-- 模式识别 -->
+  <view class="pattern-analysis card">
+    <view class="card-title">模式识别</view>
+    
+    <view class="pattern-tabs">
+      <view 
+        wx:for="{{patternTypes}}" 
+        wx:key="value"
+        class="pattern-tab {{currentPatternType === item.value ? 'active' : ''}}"
+        bindtap="switchPatternType"
+        data-type="{{item.value}}"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <view class="patterns-list">
+      <!-- 时间模式 -->
+      <view class="pattern-section" wx:if="{{currentPatternType === 'time'}}">
+        <view 
+          wx:for="{{timePatterns}}" 
+          wx:key="id"
+          class="pattern-item"
+        >
+          <view class="pattern-icon">🕐</view>
+          <view class="pattern-content">
+            <view class="pattern-title">{{item.title}}</view>
+            <view class="pattern-description">{{item.description}}</view>
+            <view class="pattern-confidence">置信度: {{item.confidence}}%</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 触发模式 -->
+      <view class="pattern-section" wx:if="{{currentPatternType === 'trigger'}}">
+        <view 
+          wx:for="{{triggerPatterns}}" 
+          wx:key="id"
+          class="pattern-item"
+        >
+          <view class="pattern-icon">⚡</view>
+          <view class="pattern-content">
+            <view class="pattern-title">{{item.title}}</view>
+            <view class="pattern-description">{{item.description}}</view>
+            <view class="pattern-tags">
+              <text 
+                wx:for="{{item.tags}}" 
+                wx:for-item="tag"
+                wx:key="*this"
+                class="pattern-tag"
+              >
+                {{tag}}
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 关联模式 -->
+      <view class="pattern-section" wx:if="{{currentPatternType === 'correlation'}}">
+        <view 
+          wx:for="{{correlationPatterns}}" 
+          wx:key="id"
+          class="pattern-item"
+        >
+          <view class="pattern-icon">🔗</view>
+          <view class="pattern-content">
+            <view class="pattern-title">{{item.title}}</view>
+            <view class="pattern-description">{{item.description}}</view>
+            <view class="correlation-strength">
+              <text>关联强度: </text>
+              <view class="strength-bar">
+                <view 
+                  class="strength-fill" 
+                  style="width: {{item.strength}}%"
+                ></view>
+              </view>
+              <text>{{item.strength}}%</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="pattern-empty" wx:if="{{currentPatterns.length === 0}}">
+      <image class="empty-icon" src="../../assets/icons/pattern-empty.png" />
+      <text class="empty-text">暂未发现明显模式，继续记录会有更多发现</text>
+    </view>
+  </view>
+
+  <!-- 改善建议 -->
+  <view class="improvement-suggestions card">
+    <view class="card-title">个性化建议</view>
+    
+    <view class="suggestions-list">
+      <view 
+        wx:for="{{suggestions}}" 
+        wx:key="id"
+        class="suggestion-item"
+      >
+        <view class="suggestion-header">
+          <image class="suggestion-icon" src="{{item.icon}}" />
+          <view class="suggestion-info">
+            <view class="suggestion-title">{{item.title}}</view>
+            <view class="suggestion-priority">{{item.priority}}</view>
+          </view>
+          <view class="suggestion-score">{{item.score}}/10</view>
+        </view>
+        <view class="suggestion-content">{{item.description}}</view>
+        <view class="suggestion-actions">
+          <button 
+            class="btn btn-outline btn-small mr-sm"
+            bindtap="dismissSuggestion"
+            data-id="{{item.id}}"
+          >
+            暂不需要
+          </button>
+          <button 
+            class="btn btn-primary btn-small"
+            bindtap="applySuggestion"
+            data-suggestion="{{item}}"
+          >
+            立即尝试
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <view class="suggestion-empty" wx:if="{{suggestions.length === 0}}">
+      <text>基于您的情绪模式，暂无特别建议</text>
+    </view>
+  </view>
+
+  <!-- 导出分享 -->
+  <view class="export-section card">
+    <view class="card-title">分享与导出</view>
+    
+    <view class="export-options">
+      <button 
+        class="btn btn-outline export-btn"
+        bindtap="generateReport"
+      >
+        <image class="btn-icon" src="../../assets/icons/report.png" />
+        生成报告
+      </button>
+      
+      <button 
+        class="btn btn-outline export-btn"
+        bindtap="shareToFriends"
+      >
+        <image class="btn-icon" src="../../assets/icons/share.png" />
+        分享成长
+      </button>
+      
+      <button 
+        class="btn btn-outline export-btn"
+        bindtap="exportData"
+      >
+        <image class="btn-icon" src="../../assets/icons/download.png" />
+        导出数据
+      </button>
+    </view>
+    
+    <view class="privacy-note">
+      <image class="privacy-icon" src="../../assets/icons/shield.png" />
+      <text>您的数据隐私受到严格保护，分享内容已匿名化处理</text>
+    </view>
+  </view>
+</view>
+
+<!-- 报告生成弹窗 -->
+<view class="modal-overlay" wx:if="{{showReportModal}}" bindtap="hideReportModal">
+  <view class="modal-content report-modal" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">情绪分析报告</view>
+      <view class="modal-close" bindtap="hideReportModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="report-preview">
+        <canvas canvas-id="reportPreview" class="report-canvas"></canvas>
+      </view>
+      <view class="report-options">
+        <view class="option-group">
+          <view class="option-label">报告类型</view>
+          <view class="option-tabs">
+            <view 
+              wx:for="{{reportTypes}}" 
+              wx:key="value"
+              class="option-tab {{selectedReportType === item.value ? 'active' : ''}}"
+              bindtap="selectReportType"
+              data-type="{{item.value}}"
+            >
+              {{item.label}}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-actions">
+      <button class="btn btn-outline mr-sm" bindtap="hideReportModal">取消</button>
+      <button class="btn btn-primary" bindtap="confirmReport">生成报告</button>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading-overlay" wx:if="{{isLoading}}">
+  <view class="loading-content">
+    <view class="loading"></view>
+    <text>{{loadingText}}</text>
+  </view>
+</view>

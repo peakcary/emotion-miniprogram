@@ -1,0 +1,438 @@
+<!-- pages/community/community.wxml -->
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="community-header">
+    <view class="header-tabs">
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="id"
+        class="tab-item {{currentTab === item.id ? 'active' : ''}}"
+        bindtap="switchTab"
+        data-tab="{{item.id}}"
+      >
+        {{item.name}}
+      </view>
+    </view>
+    
+    <view class="header-actions">
+      <view class="action-btn" bindtap="showWriteModal">
+        <image class="action-icon" src="../../assets/icons/write.png" />
+        <text>分享</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 广场动态 -->
+  <view class="tab-content" wx:if="{{currentTab === 'square'}}">
+    <!-- 热门话题 -->
+    <view class="hot-topics card" wx:if="{{hotTopics.length > 0}}">
+      <view class="card-title">
+        <text>热门话题</text>
+        <text class="topic-count">{{hotTopics.length}}个</text>
+      </view>
+      
+      <scroll-view scroll-x class="topics-scroll">
+        <view class="topics-list">
+          <view 
+            wx:for="{{hotTopics}}" 
+            wx:key="id"
+            class="topic-item"
+            bindtap="selectTopic"
+            data-topic="{{item}}"
+          >
+            <view class="topic-tag">#{{item.name}}</view>
+            <view class="topic-count">{{item.postCount}}条</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 动态列表 -->
+    <view class="posts-container">
+      <view class="filter-bar">
+        <view class="filter-tabs">
+          <view 
+            wx:for="{{filters}}" 
+            wx:key="id"
+            class="filter-item {{currentFilter === item.id ? 'active' : ''}}"
+            bindtap="switchFilter"
+            data-filter="{{item.id}}"
+          >
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+
+      <view class="posts-list">
+        <view 
+          wx:for="{{posts}}" 
+          wx:key="id"
+          class="post-item"
+          bindtap="viewPost"
+          data-post="{{item}}"
+        >
+          <!-- 用户信息 -->
+          <view class="post-header">
+            <view class="user-info">
+              <image class="user-avatar" src="{{item.author.avatar}}" />
+              <view class="user-details">
+                <view class="user-name">{{item.author.name}}</view>
+                <view class="post-time">{{item.timeAgo}}</view>
+              </view>
+            </view>
+            <view class="post-mood">
+              <text class="mood-emoji">{{item.mood.emoji}}</text>
+              <text class="mood-name">{{item.mood.name}}</text>
+            </view>
+          </view>
+
+          <!-- 内容 -->
+          <view class="post-content">
+            <view class="post-text">{{item.content}}</view>
+            <view class="post-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+              <text 
+                wx:for="{{item.tags}}" 
+                wx:key="index"
+                class="post-tag"
+              >#{{item}}</text>
+            </view>
+          </view>
+
+          <!-- 互动数据 -->
+          <view class="post-actions">
+            <view 
+              class="action-item {{item.isLiked ? 'liked' : ''}}"
+              bindtap="toggleLike"
+              data-post-id="{{item.id}}"
+              catchtap
+            >
+              <image class="action-icon" src="../../assets/icons/like.png" />
+              <text>{{item.likeCount}}</text>
+            </view>
+            
+            <view 
+              class="action-item"
+              bindtap="showComments"
+              data-post-id="{{item.id}}"
+              catchtap
+            >
+              <image class="action-icon" src="../../assets/icons/comment.png" />
+              <text>{{item.commentCount}}</text>
+            </view>
+            
+            <view 
+              class="action-item"
+              bindtap="sharePost"
+              data-post="{{item}}"
+              catchtap
+            >
+              <image class="action-icon" src="../../assets/icons/share.png" />
+              <text>分享</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{hasMore}}">
+        <view class="loading" wx:if="{{loading}}"></view>
+        <text wx:if="{{!loading}}" bindtap="loadMore">加载更多</text>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{posts.length === 0 && !loading}}">
+        <image class="empty-icon" src="../../assets/icons/empty-posts.png" />
+        <view class="empty-text">暂无动态</view>
+        <view class="empty-desc">成为第一个分享情绪的人吧</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关注动态 -->
+  <view class="tab-content" wx:if="{{currentTab === 'following'}}">
+    <view class="following-posts">
+      <view 
+        wx:for="{{followingPosts}}" 
+        wx:key="id"
+        class="post-item following-post"
+        bindtap="viewPost"
+        data-post="{{item}}"
+      >
+        <!-- 类似广场动态的结构 -->
+        <view class="post-header">
+          <view class="user-info">
+            <image class="user-avatar" src="{{item.author.avatar}}" />
+            <view class="user-details">
+              <view class="user-name">{{item.author.name}}</view>
+              <view class="post-time">{{item.timeAgo}}</view>
+            </view>
+          </view>
+          <view class="follow-status">
+            <text class="following-tag">已关注</text>
+          </view>
+        </view>
+
+        <view class="post-content">
+          <view class="post-text">{{item.content}}</view>
+        </view>
+
+        <view class="post-actions">
+          <view 
+            class="action-item {{item.isLiked ? 'liked' : ''}}"
+            bindtap="toggleLike"
+            data-post-id="{{item.id}}"
+            catchtap
+          >
+            <image class="action-icon" src="../../assets/icons/like.png" />
+            <text>{{item.likeCount}}</text>
+          </view>
+          
+          <view 
+            class="action-item"
+            bindtap="showComments"
+            data-post-id="{{item.id}}"
+            catchtap
+          >
+            <image class="action-icon" src="../../assets/icons/comment.png" />
+            <text>{{item.commentCount}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{followingPosts.length === 0}}">
+        <image class="empty-icon" src="../../assets/icons/empty-following.png" />
+        <view class="empty-text">暂无关注动态</view>
+        <view class="empty-desc">关注更多用户，发现精彩内容</view>
+        <button class="btn btn-primary" bindtap="switchTab" data-tab="square">去广场看看</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的动态 -->
+  <view class="tab-content" wx:if="{{currentTab === 'mine'}}">
+    <view class="mine-posts">
+      <view class="stats-bar">
+        <view class="stat-item">
+          <view class="stat-number">{{myStats.postCount}}</view>
+          <view class="stat-label">发布</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-number">{{myStats.likeCount}}</view>
+          <view class="stat-label">获赞</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-number">{{myStats.commentCount}}</view>
+          <view class="stat-label">评论</view>
+        </view>
+      </view>
+
+      <view class="my-posts-list">
+        <view 
+          wx:for="{{myPosts}}" 
+          wx:key="id"
+          class="post-item my-post"
+          bindtap="viewPost"
+          data-post="{{item}}"
+        >
+          <view class="post-header">
+            <view class="post-time">{{item.timeAgo}}</view>
+            <view class="post-actions">
+              <view class="action-btn" bindtap="editPost" data-post="{{item}}" catchtap>
+                <image class="action-icon" src="../../assets/icons/edit.png" />
+              </view>
+              <view class="action-btn" bindtap="deletePost" data-post-id="{{item.id}}" catchtap>
+                <image class="action-icon" src="../../assets/icons/delete.png" />
+              </view>
+            </view>
+          </view>
+
+          <view class="post-content">
+            <view class="post-text">{{item.content}}</view>
+            <view class="post-mood">
+              <text class="mood-emoji">{{item.mood.emoji}}</text>
+              <text class="mood-name">{{item.mood.name}}</text>
+            </view>
+          </view>
+
+          <view class="post-stats">
+            <text class="stat-text">{{item.likeCount}} 点赞</text>
+            <text class="stat-separator">·</text>
+            <text class="stat-text">{{item.commentCount}} 评论</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{myPosts.length === 0}}">
+        <image class="empty-icon" src="../../assets/icons/empty-mine.png" />
+        <view class="empty-text">还没有发布动态</view>
+        <view class="empty-desc">分享你的情绪，与大家连接</view>
+        <button class="btn btn-primary" bindtap="showWriteModal">写动态</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 发布动态弹窗 -->
+<view class="modal-overlay" wx:if="{{showWriteModal}}" bindtap="hideWriteModal">
+  <view class="modal-content write-modal" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">分享情绪</view>
+      <view class="modal-close" bindtap="hideWriteModal">×</view>
+    </view>
+    
+    <view class="modal-body">
+      <!-- 情绪选择 -->
+      <view class="mood-selector">
+        <view class="selector-title">当前心情</view>
+        <view class="mood-options">
+          <view 
+            wx:for="{{moodOptions}}" 
+            wx:key="id"
+            class="mood-option {{selectedMood.id === item.id ? 'selected' : ''}}"
+            bindtap="selectMood"
+            data-mood="{{item}}"
+          >
+            <text class="mood-emoji">{{item.emoji}}</text>
+            <text class="mood-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 内容输入 -->
+      <view class="content-input">
+        <textarea 
+          class="content-textarea"
+          placeholder="分享此刻的感受..."
+          value="{{postContent}}"
+          bindinput="onContentInput"
+          maxlength="200"
+          auto-height
+        />
+        <view class="input-counter">{{postContent.length}}/200</view>
+      </view>
+
+      <!-- 话题标签 -->
+      <view class="topic-selector">
+        <view class="selector-title">添加话题</view>
+        <view class="topic-input">
+          <input 
+            class="topic-input-field"
+            placeholder="输入话题（可选）"
+            value="{{currentTopic}}"
+            bindinput="onTopicInput"
+            maxlength="20"
+          />
+        </view>
+        <view class="popular-topics" wx:if="{{popularTopics.length > 0}}">
+          <text class="topics-label">热门话题：</text>
+          <view 
+            wx:for="{{popularTopics}}" 
+            wx:key="id"
+            class="topic-tag small"
+            bindtap="selectPopularTopic"
+            data-topic="{{item.name}}"
+          >#{{item.name}}</view>
+        </view>
+      </view>
+
+      <!-- 隐私设置 -->
+      <view class="privacy-selector">
+        <view class="selector-title">可见范围</view>
+        <view class="privacy-options">
+          <view 
+            wx:for="{{privacyOptions}}" 
+            wx:key="id"
+            class="privacy-option {{selectedPrivacy.id === item.id ? 'selected' : ''}}"
+            bindtap="selectPrivacy"
+            data-privacy="{{item}}"
+          >
+            <image class="privacy-icon" src="{{item.icon}}" />
+            <text class="privacy-name">{{item.name}}</text>
+            <view class="privacy-radio {{selectedPrivacy.id === item.id ? 'checked' : ''}}"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="modal-actions">
+      <button class="btn btn-outline mr-sm" bindtap="hideWriteModal">取消</button>
+      <button 
+        class="btn btn-primary" 
+        bindtap="publishPost"
+        disabled="{{!canPublish}}"
+      >发布</button>
+    </view>
+  </view>
+</view>
+
+<!-- 评论弹窗 -->
+<view class="modal-overlay" wx:if="{{showCommentsModal}}" bindtap="hideCommentsModal">
+  <view class="modal-content comments-modal" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">评论 ({{currentPost.commentCount}})</view>
+      <view class="modal-close" bindtap="hideCommentsModal">×</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="comments-list">
+        <view 
+          wx:for="{{comments}}" 
+          wx:key="id"
+          class="comment-item"
+        >
+          <view class="comment-header">
+            <image class="comment-avatar" src="{{item.author.avatar}}" />
+            <view class="comment-info">
+              <view class="comment-author">{{item.author.name}}</view>
+              <view class="comment-time">{{item.timeAgo}}</view>
+            </view>
+            <view 
+              class="comment-like {{item.isLiked ? 'liked' : ''}}"
+              bindtap="toggleCommentLike"
+              data-comment-id="{{item.id}}"
+            >
+              <image class="like-icon" src="../../assets/icons/like-small.png" />
+              <text wx:if="{{item.likeCount > 0}}">{{item.likeCount}}</text>
+            </view>
+          </view>
+          <view class="comment-content">{{item.content}}</view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="comments-empty" wx:if="{{comments.length === 0}}">
+        <text>暂无评论，来说点什么吧</text>
+      </view>
+    </view>
+
+    <!-- 评论输入 -->
+    <view class="comment-input-area">
+      <view class="comment-input">
+        <input 
+          class="comment-field"
+          placeholder="写下你的想法..."
+          value="{{commentContent}}"
+          bindinput="onCommentInput"
+          maxlength="100"
+          confirm-type="send"
+          bindconfirm="sendComment"
+        />
+        <button 
+          class="send-btn" 
+          bindtap="sendComment"
+          disabled="{{!commentContent.trim()}}"
+        >发送</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading-overlay" wx:if="{{publishing}}">
+  <view class="loading-content">
+    <view class="loading"></view>
+    <text>发布中...</text>
+  </view>
+</view>

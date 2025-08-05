@@ -1,0 +1,42 @@
+{
+  "projectname": "情绪疗愈小程序",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false
+  },
+  "description": "基于微信小程序的情绪记录与分析应用",
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "首页",
+          "pathName": "pages/index/index",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "分析页面",
+          "pathName": "pages/analysis/analysis", 
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "社区页面",
+          "pathName": "pages/community/community",
+          "query": "",
+          "launchMode": "default", 
+          "scene": null
+        },
+        {
+          "name": "个人中心",
+          "pathName": "pages/profile/profile",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  }
+}

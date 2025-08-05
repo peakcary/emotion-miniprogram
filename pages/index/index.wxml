@@ -1,0 +1,246 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <!-- 顶部问候 -->
+  <view class="greeting-section">
+    <view class="greeting-text">{{greetingText}}</view>
+    <view class="date-info">{{currentDate}}</view>
+    <view class="privacy-indicator">
+      <image class="privacy-icon" src="../../assets/icons/shield.png" />
+      <text>数据安全存储在您的设备上</text>
+    </view>
+  </view>
+
+  <!-- 快速情绪记录 -->
+  <view class="quick-record-section card">
+    <view class="card-title">今天的心情如何？</view>
+    
+    <!-- 情绪选择方式切换 -->
+    <view class="emotion-mode-tabs">
+      <view 
+        class="tab-item {{currentMode === 'emoji' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="emoji"
+      >
+        表情
+      </view>
+      <view 
+        class="tab-item {{currentMode === 'color' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="color"
+      >
+        色彩
+      </view>
+      <view 
+        class="tab-item {{currentMode === 'weather' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="weather"
+      >
+        天气
+      </view>
+    </view>
+
+    <!-- 表情符号模式 -->
+    <view class="emoji-picker" wx:if="{{currentMode === 'emoji'}}">
+      <view class="emoji-grid">
+        <view 
+          wx:for="{{emojiList}}" 
+          wx:key="id"
+          class="emoji-item {{selectedEmotion.id === item.id ? 'selected' : ''}}"
+          bindtap="selectEmotion"
+          data-emotion="{{item}}"
+        >
+          <text class="emoji">{{item.emoji}}</text>
+          <text class="emotion-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 色彩选择模式 -->
+    <view class="color-picker" wx:if="{{currentMode === 'color'}}">
+      <view class="color-palette">
+        <view 
+          wx:for="{{colorList}}" 
+          wx:key="id"
+          class="color-item {{selectedEmotion.id === item.id ? 'selected' : ''}}"
+          style="background-color: {{item.color}}"
+          bindtap="selectEmotion"
+          data-emotion="{{item}}"
+        >
+          <view class="color-overlay">
+            <text class="color-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 天气模式 -->
+    <view class="weather-picker" wx:if="{{currentMode === 'weather'}}">
+      <view class="weather-grid">
+        <view 
+          wx:for="{{weatherList}}" 
+          wx:key="id"
+          class="weather-item {{selectedEmotion.id === item.id ? 'selected' : ''}}"
+          bindtap="selectEmotion"
+          data-emotion="{{item}}"
+        >
+          <text class="weather-icon">{{item.icon}}</text>
+          <text class="weather-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 强度滑块 -->
+    <view class="intensity-section" wx:if="{{selectedEmotion}}">
+      <view class="intensity-label">情绪强度: {{intensity}}/10</view>
+      <slider 
+        class="intensity-slider"
+        min="1" 
+        max="10" 
+        value="{{intensity}}"
+        activeColor="#4CAF50"
+        backgroundColor="#e0e0e0"
+        bindchange="onIntensityChange"
+        show-value="{{false}}"
+      />
+    </view>
+
+    <!-- 快速标签 -->
+    <view class="quick-tags" wx:if="{{selectedEmotion}}">
+      <view class="tags-label">可能的原因</view>
+      <view class="tags-list">
+        <view 
+          wx:for="{{quickTags}}" 
+          wx:key="*this"
+          class="tag-item {{selectedTags.includes(item) ? 'selected' : ''}}"
+          bindtap="toggleTag"
+          data-tag="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button 
+        class="btn btn-outline mr-sm"
+        bindtap="showDetailRecord"
+        wx:if="{{selectedEmotion}}"
+      >
+        详细记录
+      </button>
+      <button 
+        class="btn btn-primary flex-1"
+        bindtap="quickSave"
+        disabled="{{!selectedEmotion}}"
+      >
+        {{saveButtonText}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 今日统计 -->
+  <view class="today-stats card" wx:if="{{todayRecords.length > 0}}">
+    <view class="card-title">今日情绪</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-number">{{todayRecords.length}}</view>
+        <view class="stat-label">记录次数</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{averageIntensity}}</view>
+        <view class="stat-label">平均强度</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{dominantEmotion}}</view>
+        <view class="stat-label">主要情绪</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI 快速洞察 -->
+  <view class="ai-insight card" wx:if="{{aiInsight}}">
+    <view class="card-title">
+      <image class="ai-icon" src="../../assets/icons/ai.png" />
+      AI 洞察
+    </view>
+    <view class="insight-content">{{aiInsight}}</view>
+    <view class="insight-actions">
+      <text class="link-text" bindtap="viewDetailAnalysis">查看详细分析</text>
+    </view>
+  </view>
+
+  <!-- 疗愈建议 -->
+  <view class="healing-suggestion card" wx:if="{{healingSuggestion}}">
+    <view class="card-title">今日建议</view>
+    <view class="suggestion-content">
+      <image class="suggestion-icon" src="{{healingSuggestion.icon}}" />
+      <view class="suggestion-text">
+        <view class="suggestion-title">{{healingSuggestion.title}}</view>
+        <view class="suggestion-desc">{{healingSuggestion.description}}</view>
+      </view>
+    </view>
+    <button class="btn btn-outline btn-small" bindtap="tryHealing">
+      立即尝试
+    </button>
+  </view>
+
+  <!-- 底部导航提示 -->
+  <view class="bottom-tips" wx:if="{{showFirstTimeTip}}">
+    <view class="tip-content">
+      <text>💡 点击底部"分析"查看情绪趋势，"社区"与他人分享心情</text>
+    </view>
+  </view>
+</view>
+
+<!-- 详细记录弹窗 -->
+<view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+  <view class="modal-content" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">详细记录</view>
+      <view class="modal-close" bindtap="hideDetailModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="input-group">
+        <view class="input-label">详细描述 (可选)</view>
+        <textarea 
+          class="input textarea"
+          placeholder="描述一下当时的情况和感受..."
+          value="{{detailDescription}}"
+          bindinput="onDescriptionInput"
+          maxlength="200"
+        />
+        <view class="char-count">{{detailDescription.length}}/200</view>
+      </view>
+      
+      <view class="input-group">
+        <view class="input-label">地点 (可选)</view>
+        <input 
+          class="input"
+          placeholder="在哪里发生的？"
+          value="{{location}}"
+          bindinput="onLocationInput"
+        />
+      </view>
+
+      <view class="input-group">
+        <view class="checkbox-item" bindtap="toggleVoiceRecord">
+          <view class="checkbox {{enableVoiceRecord ? 'checked' : ''}}"></view>
+          <text>语音记录 (本地处理)</text>
+        </view>
+      </view>
+    </view>
+    <view class="modal-actions">
+      <button class="btn btn-outline mr-sm" bindtap="hideDetailModal">取消</button>
+      <button class="btn btn-primary" bindtap="saveDetailRecord">保存记录</button>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading-overlay" wx:if="{{isLoading}}">
+  <view class="loading-content">
+    <view class="loading"></view>
+    <text>{{loadingText}}</text>
+  </view>
+</view>

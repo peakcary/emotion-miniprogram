@@ -1,0 +1,356 @@
+<!-- pages/profile/profile.wxml -->
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card card">
+    <view class="user-info" wx:if="{{userInfo}}">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || defaultAvatar}}" />
+      <view class="user-details">
+        <view class="user-name">{{userInfo.nickName || '未设置昵称'}}</view>
+        <view class="user-stats">
+          <text class="stat-item">记录 {{totalRecords}} 天</text>
+          <text class="stat-separator">·</text>
+          <text class="stat-item">连续 {{streakDays}} 天</text>
+        </view>
+        <view class="user-level">
+          <text class="level-text">{{userLevel.name}}</text>
+          <view class="level-progress">
+            <view 
+              class="level-progress-fill" 
+              style="width: {{userLevel.progress}}%"
+            ></view>
+          </view>
+        </view>
+      </view>
+      <view class="user-actions">
+        <view class="action-btn" bindtap="editProfile">
+          <image class="action-icon" src="../../assets/icons/edit.png" />
+        </view>
+      </view>
+    </view>
+    
+    <!-- 未登录状态 -->
+    <view class="login-prompt" wx:if="{{!userInfo}}">
+      <image class="login-avatar" src="../../assets/icons/user-placeholder.png" />
+      <view class="login-text">
+        <view class="login-title">登录体验更多功能</view>
+        <view class="login-desc">数据同步·个性化推荐·成长记录</view>
+      </view>
+      <button class="btn btn-primary" bindtap="loginUser">微信登录</button>
+    </view>
+  </view>
+
+  <!-- 成就徽章 -->
+  <view class="achievements card" wx:if="{{achievements.length > 0}}">
+    <view class="card-title">
+      <text>成就徽章</text>
+      <text class="achievement-count">{{achievements.length}}/{{totalAchievements}}</text>
+    </view>
+    
+    <view class="achievement-grid">
+      <view 
+        wx:for="{{achievements}}" 
+        wx:key="id"
+        class="achievement-item {{item.unlocked ? 'unlocked' : 'locked'}}"
+        bindtap="viewAchievement"
+        data-achievement="{{item}}"
+      >
+        <image class="achievement-icon" src="{{item.icon}}" />
+        <view class="achievement-name">{{item.name}}</view>
+        <view class="achievement-progress" wx:if="{{!item.unlocked && item.progress}}">
+          {{item.current}}/{{item.target}}
+        </view>
+      </view>
+    </view>
+    
+    <view class="view-all-achievements" bindtap="viewAllAchievements">
+      <text>查看全部成就</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 数据概览 -->
+  <view class="data-overview card">
+    <view class="card-title">数据概览</view>
+    
+    <view class="overview-grid">
+      <view class="overview-item" bindtap="viewDetailData" data-type="records">
+        <view class="overview-icon">📊</view>
+        <view class="overview-number">{{totalRecords}}</view>
+        <view class="overview-label">总记录数</view>
+      </view>
+      
+      <view class="overview-item" bindtap="viewDetailData" data-type="days">
+        <view class="overview-icon">📅</view>
+        <view class="overview-number">{{activeDays}}</view>
+        <view class="overview-label">活跃天数</view>
+      </view>
+      
+      <view class="overview-item" bindtap="viewDetailData" data-type="streak">
+        <view class="overview-icon">🔥</view>
+        <view class="overview-number">{{maxStreak}}</view>
+        <view class="overview-label">最长连续</view>
+      </view>
+      
+      <view class="overview-item" bindtap="viewDetailData" data-type="mood">
+        <view class="overview-icon">😊</view>
+        <view class="overview-number">{{averageMood}}</view>
+        <view class="overview-label">平均心情</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速功能 -->
+  <view class="quick-actions card">
+    <view class="card-title">快速功能</view>
+    
+    <view class="action-list">
+      <view class="action-row">
+        <view class="action-item" bindtap="exportData">
+          <image class="action-icon" src="../../assets/icons/export.png" />
+          <view class="action-info">
+            <view class="action-name">导出数据</view>
+            <view class="action-desc">导出您的情绪记录数据</view>
+          </view>
+          <text class="action-arrow">›</text>
+        </view>
+      </view>
+      
+      <view class="action-row">
+        <view class="action-item" bindtap="shareApp">
+          <image class="action-icon" src="../../assets/icons/share.png" />
+          <view class="action-info">
+            <view class="action-name">分享应用</view>
+            <view class="action-desc">推荐给朋友使用</view>
+          </view>
+          <text class="action-arrow">›</text>
+        </view>
+      </view>
+      
+      <view class="action-row">
+        <view class="action-item" bindtap="backupData">
+          <image class="action-icon" src="../../assets/icons/backup.png" />
+          <view class="action-info">
+            <view class="action-name">备份数据</view>
+            <view class="action-desc">云端安全备份</view>
+          </view>
+          <text class="action-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 设置选项 -->
+  <view class="settings card">
+    <view class="card-title">设置</view>
+    
+    <view class="setting-list">
+      <view class="setting-item" bindtap="openPrivacySettings">
+        <image class="setting-icon" src="../../assets/icons/privacy.png" />
+        <view class="setting-info">
+          <view class="setting-name">隐私设置</view>
+          <view class="setting-desc">管理数据隐私和权限</view>
+        </view>
+        <view class="setting-status">{{privacyLevel}}</view>
+        <text class="setting-arrow">›</text>
+      </view>
+      
+      <view class="setting-item" bindtap="openNotificationSettings">
+        <image class="setting-icon" src="../../assets/icons/notification.png" />
+        <view class="setting-info">
+          <view class="setting-name">提醒设置</view>
+          <view class="setting-desc">记录提醒和推送设置</view>
+        </view>
+        <switch 
+          checked="{{notificationEnabled}}" 
+          bindchange="toggleNotification"
+          class="setting-switch"
+        />
+        <text class="setting-arrow">›</text>
+      </view>
+      
+      <view class="setting-item" bindtap="openThemeSettings">
+        <image class="setting-icon" src="../../assets/icons/theme.png" />
+        <view class="setting-info">
+          <view class="setting-name">主题设置</view>
+          <view class="setting-desc">个性化界面主题</view>
+        </view>
+        <view class="setting-status">{{currentTheme}}</view>
+        <text class="setting-arrow">›</text>
+      </view>
+      
+      <view class="setting-item" bindtap="openLanguageSettings">
+        <image class="setting-icon" src="../../assets/icons/language.png" />
+        <view class="setting-info">
+          <view class="setting-name">语言设置</view>
+          <view class="setting-desc">切换界面语言</view>
+        </view>
+        <view class="setting-status">中文</view>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 帮助与反馈 -->
+  <view class="help-feedback card">
+    <view class="card-title">帮助与反馈</view>
+    
+    <view class="help-list">
+      <view class="help-item" bindtap="viewHelp">
+        <image class="help-icon" src="../../assets/icons/help.png" />
+        <text class="help-text">使用帮助</text>
+        <text class="help-arrow">›</text>
+      </view>
+      
+      <view class="help-item" bindtap="contactSupport">
+        <image class="help-icon" src="../../assets/icons/support.png" />
+        <text class="help-text">联系客服</text>
+        <text class="help-arrow">›</text>
+      </view>
+      
+      <view class="help-item" bindtap="provideFeedback">
+        <image class="help-icon" src="../../assets/icons/feedback.png" />
+        <text class="help-text">意见反馈</text>
+        <text class="help-arrow">›</text>
+      </view>
+      
+      <view class="help-item" bindtap="viewPrivacyPolicy">
+        <image class="help-icon" src="../../assets/icons/policy.png" />
+        <text class="help-text">隐私政策</text>
+        <text class="help-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于应用 -->
+  <view class="about card">
+    <view class="app-info">
+      <image class="app-logo" src="../../assets/icons/logo.png" />
+      <view class="app-details">
+        <view class="app-name">情绪小助手</view>
+        <view class="app-version">版本 {{appVersion}}</view>
+        <view class="app-desc">记录心情，关爱自己</view>
+      </view>
+    </view>
+    
+    <view class="app-actions">
+      <button class="btn btn-outline" bindtap="checkUpdate">检查更新</button>
+      <button class="btn btn-outline" bindtap="rateApp">给个好评</button>
+    </view>
+  </view>
+</view>
+
+<!-- 用户资料编辑弹窗 -->
+<view class="modal-overlay" wx:if="{{showEditModal}}" bindtap="hideEditModal">
+  <view class="modal-content edit-modal" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">编辑资料</view>
+      <view class="modal-close" bindtap="hideEditModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="edit-avatar">
+        <image class="edit-avatar-img" src="{{editUserInfo.avatarUrl || defaultAvatar}}" />
+        <button class="btn btn-outline btn-small" bindtap="changeAvatar">更换头像</button>
+      </view>
+      
+      <view class="input-group">
+        <view class="input-label">昵称</view>
+        <input 
+          class="input"
+          placeholder="请输入昵称"
+          value="{{editUserInfo.nickName}}"
+          bindinput="onNickNameInput"
+          maxlength="20"
+        />
+      </view>
+      
+      <view class="input-group">
+        <view class="input-label">个性签名</view>
+        <textarea 
+          class="input textarea"
+          placeholder="分享一句话描述现在的自己..."
+          value="{{editUserInfo.signature}}"
+          bindinput="onSignatureInput"
+          maxlength="50"
+        />
+      </view>
+    </view>
+    <view class="modal-actions">
+      <button class="btn btn-outline mr-sm" bindtap="hideEditModal">取消</button>
+      <button class="btn btn-primary" bindtap="saveProfile">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 成就详情弹窗 -->
+<view class="modal-overlay" wx:if="{{showAchievementModal}}" bindtap="hideAchievementModal">
+  <view class="modal-content achievement-modal" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">成就详情</view>
+      <view class="modal-close" bindtap="hideAchievementModal">×</view>
+    </view>
+    <view class="modal-body" wx:if="{{selectedAchievement}}">
+      <view class="achievement-detail">
+        <image class="achievement-detail-icon" src="{{selectedAchievement.icon}}" />
+        <view class="achievement-detail-name">{{selectedAchievement.name}}</view>
+        <view class="achievement-detail-desc">{{selectedAchievement.description}}</view>
+        
+        <view class="achievement-progress-detail" wx:if="{{!selectedAchievement.unlocked}}">
+          <view class="progress-label">进度</view>
+          <view class="progress-bar">
+            <view 
+              class="progress-fill" 
+              style="width: {{selectedAchievement.progress}}%"
+            ></view>
+          </view>
+          <view class="progress-text">
+            {{selectedAchievement.current}}/{{selectedAchievement.target}}
+          </view>
+        </view>
+        
+        <view class="achievement-unlock-time" wx:if="{{selectedAchievement.unlocked}}">
+          <text>解锁时间: {{selectedAchievement.unlockTime}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 隐私设置弹窗 -->
+<view class="modal-overlay" wx:if="{{showPrivacyModal}}" bindtap="hidePrivacyModal">
+  <view class="modal-content privacy-modal" catchtap="">
+    <view class="modal-header">
+      <view class="modal-title">隐私设置</view>
+      <view class="modal-close" bindtap="hidePrivacyModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="privacy-options">
+        <view 
+          wx:for="{{privacyLevels}}" 
+          wx:key="value"
+          class="privacy-option {{selectedPrivacyLevel === item.value ? 'selected' : ''}}"
+          bindtap="selectPrivacyLevel"
+          data-level="{{item.value}}"
+        >
+          <view class="privacy-option-header">
+            <image class="privacy-option-icon" src="{{item.icon}}" />
+            <view class="privacy-option-name">{{item.name}}</view>
+            <view class="privacy-radio {{selectedPrivacyLevel === item.value ? 'checked' : ''}}"></view>
+          </view>
+          <view class="privacy-option-desc">{{item.description}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-actions">
+      <button class="btn btn-outline mr-sm" bindtap="hidePrivacyModal">取消</button>
+      <button class="btn btn-primary" bindtap="savePrivacySettings">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading-overlay" wx:if="{{isLoading}}">
+  <view class="loading-content">
+    <view class="loading"></view>
+    <text>{{loadingText}}</text>
+  </view>
+</view>

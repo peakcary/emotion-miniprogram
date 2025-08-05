@@ -1,0 +1,816 @@
+/* pages/profile/profile.wxss */
+
+/* 用户信息卡片 */
+.user-card {
+  margin-bottom: var(--spacing-lg);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid #e8f5e8;
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-item {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.stat-separator {
+  font-size: 20rpx;
+  color: var(--text-muted);
+}
+
+.user-level {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.level-text {
+  font-size: 26rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.level-progress {
+  flex: 1;
+  height: 12rpx;
+  background: #f0f0f0;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 6rpx;
+  transition: width 1s ease;
+}
+
+.user-actions {
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.action-btn:active {
+  transform: scale(0.9);
+  background: var(--primary-color);
+}
+
+.action-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+/* 登录提示 */
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-xl);
+}
+
+.login-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  opacity: 0.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+.login-text {
+  margin-bottom: var(--spacing-xl);
+}
+
+.login-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.login-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* 成就徽章 */
+.achievements {
+  margin-bottom: var(--spacing-lg);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.achievement-count {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.achievement-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.achievement-item.unlocked {
+  background: linear-gradient(135deg, #fff8e1, #f3e5f5);
+  border: 2rpx solid var(--primary-color);
+}
+
+.achievement-item.locked {
+  background: #f5f5f5;
+  opacity: 0.6;
+}
+
+.achievement-item:active {
+  transform: scale(0.95);
+}
+
+.achievement-icon {
+  width: 64rpx;
+  height: 64rpx;
+  margin-bottom: var(--spacing-sm);
+}
+
+.achievement-name {
+  font-size: 24rpx;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.achievement-progress {
+  font-size: 20rpx;
+  color: var(--text-muted);
+}
+
+.view-all-achievements {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  color: var(--primary-color);
+  font-size: 26rpx;
+  padding: var(--spacing-sm);
+  text-align: center;
+}
+
+.arrow {
+  font-size: 32rpx;
+}
+
+/* 数据概览 */
+.data-overview {
+  margin-bottom: var(--spacing-lg);
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.overview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #f8f9ff, #fff8f0);
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.overview-item:active {
+  transform: scale(0.98);
+}
+
+.overview-icon {
+  font-size: 48rpx;
+  margin-bottom: var(--spacing-sm);
+}
+
+.overview-number {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-xs);
+}
+
+.overview-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+/* 快速功能 */
+.quick-actions {
+  margin-bottom: var(--spacing-lg);
+}
+
+.action-list {
+  margin-top: var(--spacing-md);
+}
+
+.action-row {
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.action-row:last-child {
+  border-bottom: none;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
+  transition: all 0.3s ease;
+}
+
+.action-item:active {
+  background: #f8f9fa;
+  transform: scale(0.98);
+}
+
+.action-item .action-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: var(--spacing-md);
+}
+
+.action-info {
+  flex: 1;
+}
+
+.action-name {
+  font-size: 30rpx;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.action-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.action-arrow {
+  font-size: 32rpx;
+  color: var(--text-muted);
+  margin-left: var(--spacing-sm);
+}
+
+/* 设置选项 */
+.settings {
+  margin-bottom: var(--spacing-lg);
+}
+
+.setting-list {
+  margin-top: var(--spacing-md);
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item:active {
+  background: #f8f9fa;
+}
+
+.setting-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: var(--spacing-md);
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-name {
+  font-size: 30rpx;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.setting-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.setting-status {
+  font-size: 26rpx;
+  color: var(--primary-color);
+  margin-right: var(--spacing-sm);
+}
+
+.setting-switch {
+  margin-right: var(--spacing-sm);
+}
+
+.setting-arrow {
+  font-size: 32rpx;
+  color: var(--text-muted);
+}
+
+/* 帮助与反馈 */
+.help-feedback {
+  margin-bottom: var(--spacing-lg);
+}
+
+.help-list {
+  margin-top: var(--spacing-md);
+}
+
+.help-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.help-item:last-child {
+  border-bottom: none;
+}
+
+.help-item:active {
+  background: #f8f9fa;
+}
+
+.help-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: var(--spacing-md);
+}
+
+.help-text {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-primary);
+}
+
+.help-arrow {
+  font-size: 32rpx;
+  color: var(--text-muted);
+}
+
+/* 关于应用 */
+.about {
+  margin-bottom: var(--spacing-xl);
+}
+
+.app-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.app-logo {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: var(--border-radius);
+  flex-shrink: 0;
+}
+
+.app-details {
+  flex: 1;
+}
+
+.app-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.app-version {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.app-desc {
+  font-size: 26rpx;
+  color: var(--text-muted);
+}
+
+.app-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  width: 90%;
+  max-width: 600rpx;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  font-size: 48rpx;
+  color: var(--text-muted);
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-top: 1rpx solid #f0f0f0;
+}
+
+/* 编辑资料弹窗 */
+.edit-modal {
+  max-width: 700rpx;
+}
+
+.edit-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.edit-avatar-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 4rpx solid #e8f5e8;
+}
+
+.input-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.input-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.input {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2rpx solid #e0e0e0;
+  border-radius: var(--border-radius);
+  font-size: 28rpx;
+  color: var(--text-primary);
+  background: #fafafa;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+  background: white;
+}
+
+.textarea {
+  height: 120rpx;
+  resize: none;
+}
+
+/* 成就详情弹窗 */
+.achievement-modal {
+  max-width: 500rpx;
+}
+
+.achievement-detail {
+  text-align: center;
+}
+
+.achievement-detail-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: var(--spacing-lg);
+}
+
+.achievement-detail-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.achievement-detail-desc {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+.achievement-progress-detail {
+  margin-bottom: var(--spacing-lg);
+}
+
+.progress-label {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-bar {
+  height: 16rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 8rpx;
+  transition: width 1s ease;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.achievement-unlock-time {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+/* 隐私设置弹窗 */
+.privacy-modal {
+  max-width: 650rpx;
+}
+
+.privacy-options {
+  margin-top: var(--spacing-md);
+}
+
+.privacy-option {
+  padding: var(--spacing-lg);
+  border: 2rpx solid #e0e0e0;
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+  transition: all 0.3s ease;
+}
+
+.privacy-option.selected {
+  border-color: var(--primary-color);
+  background: #f8fff8;
+}
+
+.privacy-option-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.privacy-option-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.privacy-option-name {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.privacy-radio {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #d0d0d0;
+  border-radius: 50%;
+  position: relative;
+}
+
+.privacy-radio.checked {
+  border-color: var(--primary-color);
+}
+
+.privacy-radio.checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16rpx;
+  height: 16rpx;
+  background: var(--primary-color);
+  border-radius: 50%;
+}
+
+.privacy-option-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 76rpx;
+}
+
+/* 加载状态 */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  background: white;
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+}
+
+.loading-content text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 350px) {
+  .achievement-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .overview-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .app-actions {
+    flex-direction: column;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 成就动画 */
+.achievement-item.unlocked {
+  animation: achievementUnlock 0.6s ease-out;
+}
+
+@keyframes achievementUnlock {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 悬停效果 */
+.overview-item:active,
+.action-item:active,
+.setting-item:active,
+.help-item:active {
+  transform: scale(0.98);
+}
+
+.achievement-item:active {
+  transform: scale(0.95);
+}

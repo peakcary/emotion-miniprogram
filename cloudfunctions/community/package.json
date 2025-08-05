@@ -1,0 +1,19 @@
+{
+  "name": "community",
+  "version": "1.0.0",
+  "description": "社区功能云函数",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "keywords": [
+    "community",
+    "social",
+    "posts"
+  ],
+  "author": "",
+  "license": "MIT"
+}

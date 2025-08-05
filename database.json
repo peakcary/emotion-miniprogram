@@ -1,0 +1,410 @@
+{
+  "collections": [
+    {
+      "name": "emotion_records",
+      "description": "情绪记录表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "openid_timestamp",
+          "fields": [
+            {"field": "openid", "direction": 1},
+            {"field": "timestamp", "direction": -1}
+          ]
+        },
+        {
+          "name": "emotion_intensity",
+          "fields": [
+            {"field": "emotion", "direction": 1},
+            {"field": "intensity", "direction": 1}
+          ]
+        }
+      ],
+      "schema": {
+        "recordId": "string",
+        "openid": "string",
+        "emotion": "string",
+        "intensity": "number",
+        "timestamp": "string",
+        "description": "string",
+        "inputMethod": "string",
+        "tags": "array",
+        "weather": "object",
+        "color": "object",
+        "createTime": "serverDate",
+        "updateTime": "serverDate",
+        "lastSyncTime": "serverDate"
+      }
+    },
+    {
+      "name": "emotion_analysis",
+      "description": "情绪分析结果表",
+      "permissions": {
+        "read": "auth",
+        "write": "server"
+      },
+      "indexes": [
+        {
+          "name": "openid_createTime",
+          "fields": [
+            {"field": "openid", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "emotionId": "string",
+        "openid": "string",
+        "analysis": "object",
+        "createTime": "serverDate",
+        "updateTime": "serverDate"
+      }
+    },
+    {
+      "name": "user_settings",
+      "description": "用户设置表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "openid",
+          "fields": [
+            {"field": "openid", "direction": 1}
+          ],
+          "unique": true
+        }
+      ],
+      "schema": {
+        "openid": "string",
+        "nickName": "string",
+        "avatarUrl": "string",
+        "signature": "string",
+        "privacyLevel": "number",
+        "notificationEnabled": "boolean",
+        "theme": "string",
+        "language": "string",
+        "createTime": "serverDate",
+        "updateTime": "serverDate"
+      }
+    },
+    {
+      "name": "community_posts",
+      "description": "社区动态表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "createTime_status",
+          "fields": [
+            {"field": "createTime", "direction": -1},
+            {"field": "status", "direction": 1}
+          ]
+        },
+        {
+          "name": "authorId_createTime",
+          "fields": [
+            {"field": "authorId", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        },
+        {
+          "name": "likeCount_createTime",
+          "fields": [
+            {"field": "likeCount", "direction": -1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "authorId": "string",
+        "authorInfo": "object",
+        "content": "string",
+        "mood": "object",
+        "tags": "array",
+        "privacy": "string",
+        "location": "object",
+        "likeCount": "number",
+        "commentCount": "number",
+        "shareCount": "number",
+        "viewCount": "number",
+        "status": "string",
+        "isHot": "boolean",
+        "isTop": "boolean",
+        "createTime": "serverDate",
+        "updateTime": "serverDate",
+        "deleteTime": "serverDate"
+      }
+    },
+    {
+      "name": "post_likes",
+      "description": "动态点赞表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "postId_userId",
+          "fields": [
+            {"field": "postId", "direction": 1},
+            {"field": "userId", "direction": 1}
+          ],
+          "unique": true
+        },
+        {
+          "name": "userId_createTime",
+          "fields": [
+            {"field": "userId", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "postId": "string",
+        "userId": "string",
+        "createTime": "serverDate"
+      }
+    },
+    {
+      "name": "post_comments",
+      "description": "动态评论表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "postId_createTime",
+          "fields": [
+            {"field": "postId", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        },
+        {
+          "name": "authorId_createTime",
+          "fields": [
+            {"field": "authorId", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "postId": "string",
+        "authorId": "string",
+        "authorInfo": "object",
+        "content": "string",
+        "replyToCommentId": "string",
+        "likeCount": "number",
+        "status": "string",
+        "createTime": "serverDate",
+        "updateTime": "serverDate"
+      }
+    },
+    {
+      "name": "comment_likes",
+      "description": "评论点赞表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "commentId_userId",
+          "fields": [
+            {"field": "commentId", "direction": 1},
+            {"field": "userId", "direction": 1}
+          ],
+          "unique": true
+        }
+      ],
+      "schema": {
+        "commentId": "string",
+        "userId": "string",
+        "createTime": "serverDate"
+      }
+    },
+    {
+      "name": "user_follows",
+      "description": "用户关注表",
+      "permissions": {
+        "read": "auth",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "followerId_followeeId",
+          "fields": [
+            {"field": "followerId", "direction": 1},
+            {"field": "followeeId", "direction": 1}
+          ],
+          "unique": true
+        },
+        {
+          "name": "followeeId_createTime",
+          "fields": [
+            {"field": "followeeId", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "followerId": "string",
+        "followeeId": "string",
+        "createTime": "serverDate"
+      }
+    },
+    {
+      "name": "topic_stats",
+      "description": "话题统计表",
+      "permissions": {
+        "read": "all",
+        "write": "server"
+      },
+      "indexes": [
+        {
+          "name": "postCount",
+          "fields": [
+            {"field": "postCount", "direction": -1}
+          ]
+        },
+        {
+          "name": "name",
+          "fields": [
+            {"field": "name", "direction": 1}
+          ],
+          "unique": true
+        }
+      ],
+      "schema": {
+        "name": "string",
+        "postCount": "number",
+        "createTime": "serverDate",
+        "updateTime": "serverDate"
+      }
+    },
+    {
+      "name": "data_backups",
+      "description": "数据备份表",
+      "permissions": {
+        "read": "auth",
+        "write": "server"
+      },
+      "indexes": [
+        {
+          "name": "openid_backupTime",
+          "fields": [
+            {"field": "openid", "direction": 1},
+            {"field": "backupTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "backupId": "string",
+        "openid": "string",
+        "userData": "object",
+        "backupTime": "serverDate",
+        "version": "string",
+        "status": "string"
+      }
+    },
+    {
+      "name": "user_activities",
+      "description": "用户活动记录表",
+      "permissions": {
+        "read": "server",
+        "write": "server"
+      },
+      "indexes": [
+        {
+          "name": "openid_createTime",
+          "fields": [
+            {"field": "openid", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        },
+        {
+          "name": "action_createTime",
+          "fields": [
+            {"field": "action", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "openid": "string",
+        "action": "string",
+        "targetId": "string",
+        "createTime": "serverDate"
+      }
+    },
+    {
+      "name": "post_reports",
+      "description": "动态举报表",
+      "permissions": {
+        "read": "server",
+        "write": "auth"
+      },
+      "indexes": [
+        {
+          "name": "status_createTime",
+          "fields": [
+            {"field": "status", "direction": 1},
+            {"field": "createTime", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "postId": "string",
+        "reporterId": "string",
+        "reason": "string",
+        "description": "string",
+        "status": "string",
+        "createTime": "serverDate",
+        "handleTime": "serverDate"
+      }
+    },
+    {
+      "name": "user_operations",
+      "description": "用户操作记录表",
+      "permissions": {
+        "read": "server",
+        "write": "server"
+      },
+      "indexes": [
+        {
+          "name": "openid_timestamp",
+          "fields": [
+            {"field": "openid", "direction": 1},
+            {"field": "timestamp", "direction": -1}
+          ]
+        }
+      ],
+      "schema": {
+        "openid": "string",
+        "operation": "string",
+        "dataTypes": "array",
+        "deleteResults": "object",
+        "timestamp": "serverDate"
+      }
+    }
+  ],
+  "security_rules": {
+    "emotion_records": "auth != null && auth.openid == resource.openid",
+    "emotion_analysis": "auth != null && auth.openid == resource.openid",
+    "user_settings": "auth != null && auth.openid == resource.openid",
+    "community_posts": "auth != null && (resource.privacy == 'public' || resource.authorId == auth.openid)",
+    "post_likes": "auth != null",
+    "post_comments": "auth != null",
+    "comment_likes": "auth != null",
+    "user_follows": "auth != null",
+    "topic_stats": "true",
+    "data_backups": "auth != null && auth.openid == resource.openid"
+  }
+}
