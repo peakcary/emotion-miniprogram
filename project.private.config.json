@@ -1,42 +1,25 @@
 {
-  "projectname": "情绪疗愈小程序",
+  "projectname": "%E6%83%85%E7%BB%AA%E7%96%97%E6%84%88%E5%B0%8F%E7%A8%8B%E5%BA%8F",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": false
+    "urlCheck": false,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "showShadowRootInWxmlPanel": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false,
+    "useIsolateContext": true
   },
   "description": "基于微信小程序的情绪记录与分析应用",
-  "condition": {
-    "miniprogram": {
-      "list": [
-        {
-          "name": "首页",
-          "pathName": "pages/index/index",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "分析页面",
-          "pathName": "pages/analysis/analysis", 
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "社区页面",
-          "pathName": "pages/community/community",
-          "query": "",
-          "launchMode": "default", 
-          "scene": null
-        },
-        {
-          "name": "个人中心",
-          "pathName": "pages/profile/profile",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        }
-      ]
-    }
-  }
+  "condition": {},
+  "libVersion": "2.32.3"
 }

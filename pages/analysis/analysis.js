@@ -63,20 +63,46 @@ Page({
 
   onLoad() {
     console.log('分析页面加载')
-    this.initAnalysis()
+    try {
+      this.initAnalysis()
+    } catch (error) {
+      console.error('分析页面初始化错误:', error)
+      wx.showToast({
+        title: '页面初始化失败',
+        icon: 'none'
+      })
+    }
   },
 
   onShow() {
     console.log('分析页面显示')
-    this.refreshAnalysis()
+    try {
+      this.refreshAnalysis()
+    } catch (error) {
+      console.error('分析页面刷新错误:', error)
+    }
   },
 
   // 初始化分析
   initAnalysis() {
-    this.loadEmotionData()
-    this.generateAIInsights()
-    this.identifyPatterns()
-    this.generateSuggestions()
+    try {
+      this.loadEmotionData()
+      this.generateAIInsights()
+      this.identifyPatterns()
+      this.generateSuggestions()
+    } catch (error) {
+      console.error('初始化分析过程错误:', error)
+      // 最小化处理，只加载基础数据
+      try {
+        this.loadEmotionData()
+      } catch (loadError) {
+        console.error('加载基础数据也失败:', loadError)
+        this.setData({
+          totalRecords: 0,
+          hasChartData: false
+        })
+      }
+    }
   },
 
   // 刷新分析数据
@@ -113,27 +139,40 @@ Page({
 
   // 加载情绪数据
   loadEmotionData() {
-    const { currentPeriod, startDate, endDate } = this.data
-    
-    // 获取所有记录
-    const allRecords = wx.getStorageSync('emotionRecords') || []
-    
-    // 根据时间周期过滤数据
-    let filteredRecords = this.filterRecordsByPeperiod(allRecords, currentPeriod, startDate, endDate)
-    
-    // 更新周期摘要
-    this.updatePeriodSummary(filteredRecords)
-    
-    // 生成统计数据
-    this.generateStatistics(filteredRecords)
-    
-    // 绘制图表
-    this.drawTrendChart(filteredRecords)
-    this.drawEmotionPieChart(filteredRecords)
+    try {
+      const { currentPeriod, startDate, endDate } = this.data
+      
+      // 获取所有记录
+      const allRecords = wx.getStorageSync('emotionRecords') || []
+      console.log('获取到记录数:', allRecords.length)
+      
+      // 根据时间周期过滤数据
+      let filteredRecords = this.filterRecordsByPeriod(allRecords, currentPeriod, startDate, endDate)
+      console.log('过滤后记录数:', filteredRecords.length)
+      
+      // 更新周期摘要
+      this.updatePeriodSummary(filteredRecords)
+      
+      // 生成统计数据
+      this.generateStatistics(filteredRecords)
+      
+      // 绘制图表
+      this.drawTrendChart(filteredRecords)
+      this.drawEmotionPieChart(filteredRecords)
+      
+    } catch (error) {
+      console.error('加载情绪数据错误:', error)
+      // 设置默认状态
+      this.setData({
+        totalRecords: 0,
+        hasChartData: false,
+        periodSummary: '数据加载失败'
+      })
+    }
   },
 
   // 根据周期过滤记录
-  filterRecordsByPeperiod(records, period, startDate, endDate) {
+  filterRecordsByPeriod(records, period, startDate, endDate) {
     const now = new Date()
     let filterDate
 
@@ -293,26 +332,35 @@ Page({
 
   // 绘制趋势图
   drawTrendChart(records) {
-    if (records.length === 0) return
+    try {
+      if (records.length === 0) return
 
-    const ctx = wx.createCanvasContext('trendChart')
-    const canvasWidth = 300
-    const canvasHeight = 200
-    const padding = 40
+      const ctx = wx.createCanvasContext('trendChart')
+      if (!ctx) {
+        console.error('无法创建Canvas上下文')
+        return
+      }
+      
+      const canvasWidth = 300
+      const canvasHeight = 200
+      const padding = 40
 
-    // 准备数据
-    const chartData = this.prepareChartData(records)
-    
-    // 清空画布
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-    
-    if (this.data.chartType === 'line') {
-      this.drawLineChart(ctx, chartData, canvasWidth, canvasHeight, padding)
-    } else {
-      this.drawBarChart(ctx, chartData, canvasWidth, canvasHeight, padding)
+      // 准备数据
+      const chartData = this.prepareChartData(records)
+      
+      // 清空画布
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+      
+      if (this.data.chartType === 'line') {
+        this.drawLineChart(ctx, chartData, canvasWidth, canvasHeight, padding)
+      } else {
+        this.drawBarChart(ctx, chartData, canvasWidth, canvasHeight, padding)
+      }
+      
+      ctx.draw()
+    } catch (error) {
+      console.error('绘制趋势图错误:', error)
     }
-    
-    ctx.draw()
   },
 
   // 准备图表数据
@@ -429,31 +477,42 @@ Page({
 
   // 绘制情绪饼图
   drawEmotionPieChart(records) {
-    if (records.length === 0) return
+    try {
+      if (records.length === 0) return
 
-    const ctx = wx.createCanvasContext('emotionPieChart')
-    const centerX = 75
-    const centerY = 75
-    const radius = 60
-
-    // 清空画布
-    ctx.clearRect(0, 0, 150, 150)
-
-    // 计算角度
-    let startAngle = 0
-    this.data.emotionStats.forEach(stat => {
-      const angle = (stat.percentage / 100) * 2 * Math.PI
+      const ctx = wx.createCanvasContext('emotionPieChart')
+      if (!ctx) {
+        console.error('无法创建饼图Canvas上下文')
+        return
+      }
       
-      ctx.beginPath()
-      ctx.moveTo(centerX, centerY)
-      ctx.arc(centerX, centerY, radius, startAngle, startAngle + angle)
-      ctx.setFillStyle(stat.color)
-      ctx.fill()
-      
-      startAngle += angle
-    })
+      const centerX = 75
+      const centerY = 75
+      const radius = 60
 
-    ctx.draw()
+      // 清空画布
+      ctx.clearRect(0, 0, 150, 150)
+
+      // 计算角度
+      let startAngle = 0
+      if (this.data.emotionStats && this.data.emotionStats.length > 0) {
+        this.data.emotionStats.forEach(stat => {
+          const angle = (stat.percentage / 100) * 2 * Math.PI
+          
+          ctx.beginPath()
+          ctx.moveTo(centerX, centerY)
+          ctx.arc(centerX, centerY, radius, startAngle, startAngle + angle)
+          ctx.setFillStyle(stat.color)
+          ctx.fill()
+          
+          startAngle += angle
+        })
+      }
+
+      ctx.draw()
+    } catch (error) {
+      console.error('绘制情绪饼图错误:', error)
+    }
   },
 
   // 切换图表类型
@@ -463,7 +522,7 @@ Page({
     
     // 重新绘制图表
     const allRecords = wx.getStorageSync('emotionRecords') || []
-    const filteredRecords = this.filterRecordsByPeperiod(
+    const filteredRecords = this.filterRecordsByPeriod(
       allRecords, 
       this.data.currentPeriod, 
       this.data.startDate, 
@@ -480,16 +539,32 @@ Page({
 
   // 生成AI洞察
   generateAIInsights() {
-    this.setData({ insightLoading: true })
+    try {
+      this.setData({ insightLoading: true })
 
-    // 模拟AI分析延迟
-    setTimeout(() => {
-      const insights = this.mockAIInsights()
+      // 模拟AI分析延迟
+      setTimeout(() => {
+        try {
+          const insights = this.mockAIInsights()
+          this.setData({
+            aiInsights: insights,
+            insightLoading: false
+          })
+        } catch (error) {
+          console.error('生成AI洞察错误:', error)
+          this.setData({
+            aiInsights: [],
+            insightLoading: false
+          })
+        }
+      }, 2000)
+    } catch (error) {
+      console.error('启动AI洞察分析错误:', error)
       this.setData({
-        aiInsights: insights,
+        aiInsights: [],
         insightLoading: false
       })
-    }, 2000)
+    }
   },
 
   // 模拟AI洞察数据

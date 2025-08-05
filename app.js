@@ -29,6 +29,9 @@ App({
     
     // 获取系统信息
     this.getSystemInfo()
+    
+    // 初始化测试数据
+    this.initTestData()
   },
 
   onShow() {
@@ -41,6 +44,28 @@ App({
 
   onError(error) {
     console.error('小程序错误:', error)
+    
+    // 特殊处理常见错误
+    if (error && error.includes && error.includes('_getData is not a function')) {
+      console.error('检测到_getData方法调用错误，可能的原因：')
+      console.error('1. 页面中调用了不存在的_getData方法')
+      console.error('2. 组件绑定了错误的事件处理函数')
+      console.error('3. 代码中有拼写错误')
+      
+      // 显示用户友好的错误信息
+      wx.showModal({
+        title: '应用错误',
+        content: '检测到功能调用异常，请尝试重启小程序。如果问题持续存在，请联系开发者。',
+        showCancel: false,
+        confirmText: '重启小程序',
+        success: () => {
+          wx.reLaunch({
+            url: '/pages/index/index'
+          })
+        }
+      })
+    }
+    
     // 错误上报
     this.reportError(error)
   },
@@ -105,6 +130,48 @@ App({
     })
   },
 
+  // 初始化测试数据
+  initTestData() {
+    try {
+      // 检查是否已有数据
+      const existingRecords = wx.getStorageSync('emotionRecords')
+      if (existingRecords && existingRecords.length > 0) {
+        console.log('已有情绪记录数据，跳过初始化')
+        return
+      }
+
+      // 创建一些测试数据
+      const now = new Date()
+      const testRecords = []
+      
+      // 最近7天的测试数据
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+        testRecords.push({
+          id: `test_${i}_${Date.now()}`,
+          emotion: {
+            id: Math.floor(Math.random() * 8) + 1,
+            emoji: ['😊', '😐', '😔', '😡', '😰', '😴', '🤗', '🤔'][Math.floor(Math.random() * 8)],
+            name: ['开心', '平静', '悲伤', '愤怒', '焦虑', '疲惫', '温暖', '困惑'][Math.floor(Math.random() * 8)]
+          },
+          intensity: Math.floor(Math.random() * 10) + 1,
+          tags: ['工作', '学习', '家庭'][Math.floor(Math.random() * 3)],
+          description: '测试情绪记录',
+          timestamp: date.getTime(),
+          location: '',
+          source: 'test_data'
+        })
+      }
+      
+      // 保存测试数据
+      wx.setStorageSync('emotionRecords', testRecords)
+      console.log('初始化测试数据完成，共', testRecords.length, '条记录')
+      
+    } catch (error) {
+      console.error('初始化测试数据失败:', error)
+    }
+  },
+
   // 错误上报
   reportError(error) {
     try {
@@ -146,7 +213,7 @@ App({
     screenRatio: 1,
     version: '1.0.0',
     isDev: false, // 通过构建脚本设置
-    cloudEnv: 'emotion-helper-prod', // 云开发环境ID
+    cloudEnv: 'cloud1-8g0nzxjxe1f94684', // 云开发环境ID
     // 应用配置
     config: {
       privacyLevel: 1, // 隐私等级：1-基础 2-匿名 3-透明
