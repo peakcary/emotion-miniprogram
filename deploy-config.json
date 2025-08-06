@@ -1,0 +1,125 @@
+{
+  "project": {
+    "name": "情绪小程序",
+    "appid": "wxf2a1defe4093ab24",
+    "version": "1.0.0",
+    "description": "情绪记录与分析小程序"
+  },
+  "cloud": {
+    "environment": "cloud1-8g0nzxjxe1f94684",
+    "region": "ap-shanghai",
+    "functions": [
+      {
+        "name": "user-data",
+        "runtime": "Nodejs16.14",
+        "timeout": 30,
+        "memory": 256,
+        "envVariables": {
+          "NODE_ENV": "production"
+        },
+        "triggers": []
+      },
+      {
+        "name": "community",
+        "runtime": "Nodejs16.14", 
+        "timeout": 30,
+        "memory": 256,
+        "envVariables": {
+          "NODE_ENV": "production"
+        },
+        "triggers": []
+      },
+      {
+        "name": "emotion-analysis",
+        "runtime": "Nodejs16.14",
+        "timeout": 60,
+        "memory": 512,
+        "envVariables": {
+          "NODE_ENV": "production"
+        },
+        "triggers": []
+      }
+    ],
+    "databases": [
+      {
+        "name": "emotion_records",
+        "description": "情绪记录数据",
+        "permissions": {
+          "read": "auth.openid == doc._openid",
+          "write": "auth.openid == doc._openid"
+        }
+      },
+      {
+        "name": "community_posts", 
+        "description": "社区帖子数据",
+        "permissions": {
+          "read": true,
+          "write": "auth.openid == doc._openid"
+        }
+      },
+      {
+        "name": "user_profiles",
+        "description": "用户资料数据", 
+        "permissions": {
+          "read": "auth.openid == doc._openid",
+          "write": "auth.openid == doc._openid"
+        }
+      },
+      {
+        "name": "post_comments",
+        "description": "帖子评论数据",
+        "permissions": {
+          "read": true,
+          "write": "auth.openid == doc._openid"
+        }
+      },
+      {
+        "name": "user_achievements",
+        "description": "用户成就数据",
+        "permissions": {
+          "read": "auth.openid == doc._openid", 
+          "write": "auth.openid == doc._openid"
+        }
+      }
+    ],
+    "storage": {
+      "buckets": [
+        {
+          "name": "user-avatars",
+          "description": "用户头像存储",
+          "permissions": {
+            "read": true,
+            "write": "auth != null"
+          }
+        }
+      ]
+    }
+  },
+  "security": {
+    "domainWhitelist": [
+      "*.qq.com",
+      "*.weixin.qq.com"
+    ],
+    "requestTimeout": 60000,
+    "dataEncryption": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "logLevel": "info",
+    "metrics": [
+      "function_invocation",
+      "function_duration", 
+      "database_read",
+      "database_write"
+    ]
+  },
+  "deployment": {
+    "strategy": "blue-green",
+    "rollbackEnabled": true,
+    "healthCheck": {
+      "enabled": true,
+      "interval": 30,
+      "timeout": 10
+    }
+  }
+}
