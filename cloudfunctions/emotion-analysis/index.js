@@ -17,7 +17,19 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   
   try {
-    const { action, data } = event
+    const { action, data, content, records } = event
+    
+    // 测试接口
+    if (action === 'test') {
+      return {
+        success: true,
+        message: '情绪分析云函数连接正常',
+        timestamp: new Date().getTime(),
+        env: wxContext.ENV
+      }
+    }
+    
+    const { action: realAction, data: realData } = event
     
     switch (action) {
       case 'analyze':

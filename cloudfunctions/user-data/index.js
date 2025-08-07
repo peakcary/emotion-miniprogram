@@ -18,6 +18,14 @@ exports.main = async (event, context) => {
     const { action, data } = event
     
     switch (action) {
+      case 'test':
+        return {
+          success: true,
+          message: '云函数连接正常',
+          timestamp: new Date().getTime(),
+          env: wxContext.ENV,
+          openid: wxContext.OPENID
+        }
       case 'syncEmotionRecord':
         return await syncEmotionRecord(data, wxContext)
       case 'getUserData':

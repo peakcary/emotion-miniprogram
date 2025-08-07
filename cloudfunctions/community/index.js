@@ -18,6 +18,13 @@ exports.main = async (event, context) => {
     const { action, data } = event
     
     switch (action) {
+      case 'test':
+        return {
+          success: true,
+          message: '社区云函数连接正常',
+          timestamp: new Date().getTime(),
+          env: wxContext.ENV
+        }
       case 'publishPost':
         return await publishPost(data, wxContext)
       case 'getPosts':

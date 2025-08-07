@@ -64,13 +64,25 @@ Page({
   onLoad() {
     console.log('分析页面加载')
     try {
-      this.initAnalysis()
+      // 添加安全检查
+      if (typeof this.initAnalysis === 'function') {
+        this.initAnalysis()
+      } else {
+        console.error('initAnalysis方法不存在')
+        this.loadEmotionData() // 降级处理
+      }
     } catch (error) {
       console.error('分析页面初始化错误:', error)
-      wx.showToast({
-        title: '页面初始化失败',
-        icon: 'none'
-      })
+      // 降级处理：只加载基础数据
+      try {
+        this.loadEmotionData()
+      } catch (loadError) {
+        console.error('基础数据加载失败:', loadError)
+        wx.showToast({
+          title: '数据加载失败，请重试',
+          icon: 'none'
+        })
+      }
     }
   },
 

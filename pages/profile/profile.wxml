@@ -54,7 +54,7 @@
         bindtap="viewAchievement"
         data-achievement="{{item}}"
       >
-        <image class="achievement-icon" src="{{item.icon}}" />
+        <image class="achievement-icon" src="{{item.icon}}" onerror="handleImageError" />
         <view class="achievement-name">{{item.name}}</view>
         <view class="achievement-progress" wx:if="{{!item.unlocked && item.progress}}">
           {{item.current}}/{{item.target}}
@@ -290,7 +290,7 @@
     </view>
     <view class="modal-body" wx:if="{{selectedAchievement}}">
       <view class="achievement-detail">
-        <image class="achievement-detail-icon" src="{{selectedAchievement.icon}}" />
+        <image class="achievement-detail-icon" src="{{selectedAchievement.icon}}" onerror="handleImageError" />
         <view class="achievement-detail-name">{{selectedAchievement.name}}</view>
         <view class="achievement-detail-desc">{{selectedAchievement.description}}</view>
         

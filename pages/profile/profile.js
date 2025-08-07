@@ -1,6 +1,7 @@
 // pages/profile/profile.js
 const app = getApp()
 const { Validator } = require('../../utils/validator')
+const { ErrorHandler } = require('../../utils/errorHandler')
 
 Page({
   data: {
@@ -68,10 +69,13 @@ Page({
     loadingText: '处理中...'
   },
 
-  onLoad() {
+  onLoad: ErrorHandler.safeLifecycle(function() {
     console.log('个人中心加载')
-    this.initProfile()
-  },
+    ErrorHandler.safeMethodCall(this, 'initProfile', [], () => {
+      console.log('初始化失败，使用默认数据')
+      this.setData({ totalRecords: 0, achievements: [] })
+    })
+  }, 'onLoad'),
 
   onShow() {
     console.log('个人中心显示')
@@ -293,7 +297,7 @@ Page({
     for (const achievement of newAchievements) {
       wx.showModal({
         title: '🎉 恭喜解锁成就！',
-        content: `${achievement.icon} ${achievement.name}\n${achievement.description}\n\n获得奖励：+${achievement.reward.exp} 经验值`,
+        content: `🏆 ${achievement.name}\n${achievement.description}\n\n获得奖励：+${achievement.reward.exp} 经验值`,
         confirmText: '太棒了',
         showCancel: false,
         success: () => {
@@ -314,6 +318,14 @@ Page({
       notificationEnabled: settings.notificationEnabled !== false,
       currentTheme: settings.theme || '清新绿色'
     })
+  },
+
+  // 处理图片加载错误
+  handleImageError(e) {
+    console.warn('图片加载失败:', e.detail.errMsg)
+    // 设置默认图片
+    const defaultIcon = '../../assets/icons/default.png'
+    // 可以通过事件获取的target设置默认图片
   },
 
   // 获取隐私等级名称

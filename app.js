@@ -6,14 +6,21 @@ App({
     // 初始化云开发
     if (wx.cloud) {
       try {
+        console.log('开始初始化云开发，环境ID:', this.globalData.cloudEnv)
         wx.cloud.init({
           env: this.globalData.cloudEnv,
           traceUser: true,
         })
         console.log('云开发初始化成功')
+        
+        // 验证云开发状态
+        setTimeout(() => {
+          this.testCloudFunction()
+        }, 1000)
       } catch (error) {
         console.error('云开发初始化失败:', error)
         this.reportError(error)
+        this.globalData.cloudAvailable = false
         // 不影响应用正常运行，降级到本地模式
       }
     } else if (!this.globalData.isDev) {
@@ -204,6 +211,33 @@ App({
     }
   },
 
+  // 云函数测试
+  testCloudFunction() {
+    console.log('开始测试云函数连接...')
+    wx.cloud.callFunction({
+      name: 'user-data',
+      data: {
+        action: 'test'
+      }
+    }).then(res => {
+      console.log('✅ 云函数连接成功:', res)
+      this.globalData.cloudAvailable = true
+    }).catch(err => {
+      console.error('❌ 云函数连接失败:', err)
+      this.globalData.cloudAvailable = false
+      
+      // 显示友好错误信息
+      if (err.message && err.message.includes('env check invalid')) {
+        wx.showModal({
+          title: '云环境配置问题',
+          content: '请检查云开发环境是否正确配置，或者使用本地模式继续使用。',
+          confirmText: '了解',
+          showCancel: false
+        })
+      }
+    })
+  },
+
   // 全局数据
   globalData: {
     userInfo: null,
@@ -214,6 +248,7 @@ App({
     version: '1.0.0',
     isDev: false, // 通过构建脚本设置
     cloudEnv: 'cloud1-8g0nzxjxe1f94684', // 云开发环境ID
+    cloudAvailable: false, // 云开发可用状态
     // 应用配置
     config: {
       privacyLevel: 1, // 隐私等级：1-基础 2-匿名 3-透明
